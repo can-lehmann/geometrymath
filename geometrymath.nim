@@ -47,7 +47,7 @@ type
   Vec4* = Vector4[float64]
   Index4* = Vector4[int]
 
-template vector_unop(op) =
+template vectorUnop(op) =
   proc op*[T](vec: Vector2[T]): Vector2[T] {.inline.} =
     result = Vector2[T](x: op(vec.x), y: op(vec.y))
   
@@ -57,13 +57,13 @@ template vector_unop(op) =
   proc op*[T](vec: Vector4[T]): Vector4[T] {.inline.} =
     result = Vector4[T](x: op(vec.x), y: op(vec.y), z: op(vec.z), w: op(vec.w))
 
-vector_unop(`-`)
-vector_unop(`abs`)
-vector_unop(`floor`)
-vector_unop(`ceil`)
-vector_unop(`round`)
+vectorUnop(`-`)
+vectorUnop(`abs`)
+vectorUnop(`floor`)
+vectorUnop(`ceil`)
+vectorUnop(`round`)
 
-template vector_binop(op) =
+template vectorBinop(op) =
   proc op*[T](a, b: Vector2[T]): Vector2[T] {.inline.} =
     result = Vector2[T](x: op(a.x, b.x), y: op(a.y, b.y))
   
@@ -73,15 +73,15 @@ template vector_binop(op) =
   proc op*[T](a, b: Vector4[T]): Vector4[T] {.inline.} =
     result = Vector4[T](x: op(a.x, b.x), y: op(a.y, b.y), z: op(a.z, b.z), z: op(a.w, b.w))
 
-vector_binop(`+`)
-vector_binop(`-`)
-vector_binop(`*`)
-vector_binop(`/`)
-vector_binop(`mod`)
-vector_binop(`min`)
-vector_binop(`max`)
+vectorBinop(`+`)
+vectorBinop(`-`)
+vectorBinop(`*`)
+vectorBinop(`/`)
+vectorBinop(`mod`)
+vectorBinop(`min`)
+vectorBinop(`max`)
 
-template vector_binop_scalar(op) =
+template vectorBinopScalar(op) =
   proc op*[T](a: T, b: Vector2[T]): Vector2[T] {.inline.} =
     result = Vector2[T](x: op(a, b.x), y: op(a, b.y))
   
@@ -100,13 +100,13 @@ template vector_binop_scalar(op) =
   proc op*[T](a: Vector4[T], b: T): Vector4[T] {.inline.} =
     result = Vector4[T](x: op(a.x, b), y: op(a.y, b), z: op(a.z, b), w: op(a.w, b))
 
-vector_binop_scalar(`*`)
-vector_binop_scalar(`/`)
-vector_binop_scalar(`mod`)
-vector_binop_scalar(min)
-vector_binop_scalar(max)
+vectorBinopScalar(`*`)
+vectorBinopScalar(`/`)
+vectorBinopScalar(`mod`)
+vectorBinopScalar(min)
+vectorBinopScalar(max)
 
-template vector_binop_mut(op) =
+template vectorBinopMut(op) =
   proc op*[T](a: var Vector2[T], b: Vector2[T]) {.inline.} =
     op(a.x, b.x)
     op(a.y, b.y)
@@ -122,12 +122,12 @@ template vector_binop_mut(op) =
     op(a.z, b.z)
     op(a.w, b.w)
 
-vector_binop_mut(`+=`)
-vector_binop_mut(`-=`)
-vector_binop_mut(`*=`)
-vector_binop_mut(`/=`)
+vectorBinopMut(`+=`)
+vectorBinopMut(`-=`)
+vectorBinopMut(`*=`)
+vectorBinopMut(`/=`)
 
-template vector_binop_mut_scalar(op) =
+template vectorBinopMutScalar(op) =
   proc op*[T](a: var Vector2[T], b: T) {.inline.} =
     op(a.x, b)
     op(a.y, b)
@@ -143,8 +143,8 @@ template vector_binop_mut_scalar(op) =
     op(a.z, b)
     op(a.w, b)
 
-vector_binop_mut_scalar(`*=`)
-vector_binop_mut_scalar(`/=`)
+vectorBinopMutScalar(`*=`)
+vectorBinopMutScalar(`/=`)
 
 {.push inline.}
 proc dot*[T](a, b: Vector2[T]): T =
@@ -176,10 +176,10 @@ proc cross*[T](a, b: Vector3[T]): Vector3[T] =
     z: a.x * b.y - a.y * b.x
   )
 
-proc to_vec2*(index: Index2): Vec2 =
+proc toVec2*(index: Index2): Vec2 =
   result = Vec2(x: float64(index.x), y: float64(index.y))
 
-proc to_index2*(vec: Vec2): Index2 =
+proc toIndex2*(vec: Vec2): Index2 =
   result = Index2(x: int(vec.x), y: int(vec.y))
 {.pop.}
 
@@ -220,10 +220,10 @@ type
 proc size*[T](box: BoundingBox[T]): T {.inline.} = box.max - box.min
 proc center*[T](box: BoundingBox[T]): T {.inline.} = (box.max + box.min) / 2
 
-proc x_inter*[T](box: BoundingBox2[T]): BoundingBox[T] =
+proc xInter*[T](box: BoundingBox2[T]): BoundingBox[T] =
   result = BoundingBox[T](min: box.min.x, max: box.max.x)
 
-proc y_inter*[T](box: BoundingBox2[T]): BoundingBox[T] =
+proc yInter*[T](box: BoundingBox2[T]): BoundingBox[T] =
   result = BoundingBox[T](min: box.min.y, max: box.max.y)
 
 type
@@ -269,12 +269,12 @@ proc `*`*[T, H, W, N](a: StaticMatrix[T, H, N],
         result[y, x] += a[y, it] * b[it, x]
 
 proc `[]`*[T, H, W](mat: StaticMatrix[T, H, W],
-                    y_slice: static[HSlice[int, int]],
-                    x_slice: static[HSlice[int, int]]): auto =
-  result = StaticMatrix[T, y_slice.b - y_slice.a + 1, x_slice.b - x_slice.a + 1]()
-  for y in y_slice:
-    for x in y_slice:
-      result[y - y_slice.a, x - x_slice.a] = mat[y, x]
+                    ySlice: static[HSlice[int, int]],
+                    xSlice: static[HSlice[int, int]]): auto =
+  result = StaticMatrix[T, ySlice.b - ySlice.a + 1, xSlice.b - xSlice.a + 1]()
+  for y in ySlice:
+    for x in ySlice:
+      result[y - ySlice.a, x - xSlice.a] = mat[y, x]
 
 proc det*[T](mat: Matrix2[T]): T =
   result = mat[0, 0] * mat[1, 1] - mat[0, 1] * mat[1, 0]
@@ -325,19 +325,19 @@ proc scale*[T](typ: typedesc[Matrix4[T]], factors: Vector3[T]): Matrix4[T] =
 proc init*[T; H, W](_: typedesc[StaticMatrix[T, H, W]], data: array[H * W, T]): StaticMatrix[T, H, W] =
   result = StaticMatrix[T, H, W](data: data)
 
-proc to_matrix*[T](vec: Vector2[T]): StaticMatrix[T, 2, 1] =
+proc toMatrix*[T](vec: Vector2[T]): StaticMatrix[T, 2, 1] =
   result = StaticMatrix[T, 2, 1](data: [vec.x, vec.y])
 
-proc to_matrix*[T](vec: Vector3[T]): StaticMatrix[T, 3, 1] =
+proc toMatrix*[T](vec: Vector3[T]): StaticMatrix[T, 3, 1] =
   result = StaticMatrix[T, 3, 1](data: [vec.x, vec.y, vec.z])
 
-proc to_matrix*[T](vec: Vector4[T]): StaticMatrix[T, 4, 1] =
+proc toMatrix*[T](vec: Vector4[T]): StaticMatrix[T, 4, 1] =
   result = StaticMatrix[T, 4, 1](data: [vec.x, vec.y, vec.z, vec.w])
 
-proc to_vector3*[T](mat: StaticMatrix[T, 3, 1]): Vector3[T] =
+proc toVector3*[T](mat: StaticMatrix[T, 3, 1]): Vector3[T] =
   result = Vector3[T](x: mat.data[0], y: mat.data[1], z: mat.data[2])
 
-template define_unit(T, Base: untyped, sym: string) =
+template defineUnit(T, Base: untyped, sym: string) =
   type T* = distinct Base
   
   proc `+`*(a, b: T): T {.borrow.}
@@ -365,41 +365,41 @@ template define_unit(T, Base: untyped, sym: string) =
   proc `$`*(x: T): string =
     result = $float64(x) & sym
 
-define_unit(Deg, float64, "°")
-define_unit(Rad, float64, "rad")
+defineUnit(Deg, float64, "°")
+defineUnit(Rad, float64, "rad")
 
-converter to_rad*(deg: Deg): Rad =
+converter toRad*(deg: Deg): Rad =
   result = Rad(float64(deg) / 180 * PI)
 
-converter to_deg*(rad: Rad): Deg =
+converter toDeg*(rad: Rad): Deg =
   result = Deg(float64(rad) / PI * 180)
 
 proc sin*(rad: Rad): float64 = sin(float64(rad))
 proc cos*(rad: Rad): float64 = cos(float64(rad))
 proc tan*(rad: Rad): float64 = tan(float64(rad))
 
-proc rotate_x*(_: typedesc[Mat3], angle: Rad): Mat3 =
+proc rotateX*(_: typedesc[Mat3], angle: Rad): Mat3 =
   result = Mat3(data: [
     float64 1, 0, 0,
     0, cos(angle), -sin(angle),
     0, sin(angle), cos(angle)
   ])
 
-proc rotate_y*(_: typedesc[Mat3], angle: Rad): Mat3 =
+proc rotateY*(_: typedesc[Mat3], angle: Rad): Mat3 =
   result = Mat3(data: [
     cos(angle), 0, sin(angle),
     0, 1, 0,
     -sin(angle), 0, cos(angle)
   ])
 
-proc rotate_z*(_: typedesc[Mat3], angle: Rad): Mat3 =
+proc rotateZ*(_: typedesc[Mat3], angle: Rad): Mat3 =
   result = Mat3(data: [
     cos(angle), -sin(angle), 0,
     sin(angle), cos(angle), 0,
     0, 0, 1
   ])
 
-proc rotate_x*(_: typedesc[Mat4], angle: Rad): Mat4 =
+proc rotateX*(_: typedesc[Mat4], angle: Rad): Mat4 =
   result = Mat4(data: [
     float64 1, 0, 0, 0,
     0, cos(angle), -sin(angle), 0,
@@ -407,7 +407,7 @@ proc rotate_x*(_: typedesc[Mat4], angle: Rad): Mat4 =
     0, 0, 0, 1
   ])
 
-proc rotate_y*(_: typedesc[Mat4], angle: Rad): Mat4 =
+proc rotateY*(_: typedesc[Mat4], angle: Rad): Mat4 =
   result = Mat4(data: [
     cos(angle), 0, sin(angle), 0,
     0, 1, 0, 0,
@@ -415,7 +415,7 @@ proc rotate_y*(_: typedesc[Mat4], angle: Rad): Mat4 =
     0, 0, 0, 1
   ])
 
-proc rotate_z*(_: typedesc[Mat4], angle: Rad): Mat4 =
+proc rotateZ*(_: typedesc[Mat4], angle: Rad): Mat4 =
   result = Mat4(data: [
     cos(angle), -sin(angle), 0, 0,
     sin(angle), cos(angle), 0, 0,
