@@ -82,6 +82,20 @@ echo inter.size # 1.0
 echo inter.center # 1.5
 ```
 
+## Angles
+
+```nim
+echo Deg(90) # 90.0°
+echo Rad(PI / 2) # 1.570796326794897rad
+
+echo Rad(PI).toDeg() # 180.0°
+echo sin(Deg(90)) # 1.0
+
+echo Mat2.rotate(Deg(90))
+# [6.123233995736766e-17, -1.0;
+#  1.0,                   6.123233995736766e-17]
+```
+
 ## License
 
 geometrymath is licensed under the MIT license.

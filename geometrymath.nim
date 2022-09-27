@@ -273,7 +273,7 @@ proc `[]`*[T, H, W](mat: StaticMatrix[T, H, W],
                     xSlice: static[HSlice[int, int]]): auto =
   result = StaticMatrix[T, ySlice.b - ySlice.a + 1, xSlice.b - xSlice.a + 1]()
   for y in ySlice:
-    for x in ySlice:
+    for x in xSlice:
       result[y - ySlice.a, x - xSlice.a] = mat[y, x]
 
 proc det*[T](mat: Matrix2[T]): T =
@@ -377,6 +377,12 @@ converter toDeg*(rad: Rad): Deg =
 proc sin*(rad: Rad): float64 = sin(float64(rad))
 proc cos*(rad: Rad): float64 = cos(float64(rad))
 proc tan*(rad: Rad): float64 = tan(float64(rad))
+
+proc rotate*(_: typedesc[Mat2], angle: Rad): Mat2 =
+  result = Mat2(data: [
+    cos(angle), -sin(angle),
+    sin(angle), cos(angle)
+  ])
 
 proc rotateX*(_: typedesc[Mat3], angle: Rad): Mat3 =
   result = Mat3(data: [
