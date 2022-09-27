@@ -245,6 +245,17 @@ proc `[]`*[T, H, W](mat: var StaticMatrix[T, H, W], y, x: int): var T = mat.data
 proc `[]=`*[T, H, W](mat: var StaticMatrix[T, H, W], y, x: int, value: T) = mat.data[x + y * W] = value
 {.pop.}
 
+proc `$`*[T, H, W](mat: StaticMatrix[T, H, W]): string =
+  result.add('[')
+  for y in 0..<H:
+    if y != 0:
+      result.add("; ")
+    for x in 0..<W:
+      if x != 0:
+        result.add(", ")
+      result.add($mat[y, x])
+  result.add(']')
+
 proc transpose*[T, H, W](matrix: StaticMatrix[T, W, H]): StaticMatrix[T, H, W] =
   for y in 0..<H:
     for x in 0..<W:
@@ -310,6 +321,9 @@ proc scale*[T](typ: typedesc[Matrix4[T]], factors: Vector3[T]): Matrix4[T] =
   result[1, 1] = factors.y
   result[2, 2] = factors.z
   result[3, 3] = T(1)
+
+proc init*[T; H, W](_: typedesc[StaticMatrix[T, H, W]], data: array[H * W, T]): StaticMatrix[T, H, W] =
+  result = StaticMatrix[T, H, W](data: data)
 
 proc to_matrix*[T](vec: Vector2[T]): StaticMatrix[T, 2, 1] =
   result = StaticMatrix[T, 2, 1](data: [vec.x, vec.y])
