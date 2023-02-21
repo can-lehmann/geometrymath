@@ -77,6 +77,7 @@ vectorBinop(`+`)
 vectorBinop(`-`)
 vectorBinop(`*`)
 vectorBinop(`/`)
+vectorBinop(`div`)
 vectorBinop(`mod`)
 vectorBinop(`min`)
 vectorBinop(`max`)
@@ -103,6 +104,7 @@ template vectorBinopScalar(op) =
 vectorBinopScalar(`*`)
 vectorBinopScalar(`/`)
 vectorBinopScalar(`mod`)
+vectorBinopScalar(`div`)
 vectorBinopScalar(min)
 vectorBinopScalar(max)
 
@@ -181,6 +183,9 @@ proc toVec2*(index: Index2): Vec2 =
 
 proc toIndex2*(vec: Vec2): Index2 =
   result = Index2(x: int(vec.x), y: int(vec.y))
+
+proc toVector4*[T](vec: Vector3[T], w: T): Vector4[T] =
+  result = Vector4[T](x: vec.x, y: vec.y, z: vec.z, w: w)
 {.pop.}
 
 type Axis* = distinct int
@@ -334,8 +339,23 @@ proc toMatrix*[T](vec: Vector3[T]): StaticMatrix[T, 3, 1] =
 proc toMatrix*[T](vec: Vector4[T]): StaticMatrix[T, 4, 1] =
   result = StaticMatrix[T, 4, 1](data: [vec.x, vec.y, vec.z, vec.w])
 
+proc toVector2*[T](mat: StaticMatrix[T, 2, 1]): Vector2[T] =
+  result = Vector2[T](x: mat.data[0], y: mat.data[1])
+
 proc toVector3*[T](mat: StaticMatrix[T, 3, 1]): Vector3[T] =
   result = Vector3[T](x: mat.data[0], y: mat.data[1], z: mat.data[2])
+
+proc toVector4*[T](mat: StaticMatrix[T, 4, 1]): Vector4[T] =
+  result = Vector4[T](x: mat.data[0], y: mat.data[1], z: mat.data[2], w: mat.data[3])
+
+proc `*`*[T](mat: Matrix2[T], vec: Vector2[T]): Vector2[T] =
+  result = toVector2(mat * toMatrix(vec))
+
+proc `*`*[T](mat: Matrix3[T], vec: Vector3[T]): Vector3[T] =
+  result = toVector3(mat * toMatrix(vec))
+
+proc `*`*[T](mat: Matrix4[T], vec: Vector4[T]): Vector4[T] =
+  result = toVector4(mat * toMatrix(vec))
 
 template defineUnit(T, Base: untyped, sym: string) =
   type T* = distinct Base
